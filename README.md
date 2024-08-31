@@ -1,6 +1,6 @@
-# estufaAutomaticaFeiraCiencias
+# Estufa Automática para Feira de Ciências
 
-Projeto de estufa automátizada feita em arduino para feira de ciências
+Projeto de estufa automátizada feita em arduino para a feira de ciências EEJBH 2024
 
 Todas as bibliotecas utilizadas estão na pasta libraries do projeto, as mesma devem ser colocadas
 na pasta libraries do Arduino, para que a IDE consiga encontrar as bibliotecas.
@@ -11,7 +11,7 @@ Há mais informações sobre o código do projeto no arquivo ScienceFairGreenhou
 
 Há mais informações sobre a biblioteca ScienceFairGreenhouse no arquivo README.adoc da própria biblioteca
 
-=== Utilização ===
+## Utilização
 
 Há dois modos de utilização, automático e manual, que podem ser trocados acionando botões.
 
