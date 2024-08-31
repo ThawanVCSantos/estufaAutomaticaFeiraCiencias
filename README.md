@@ -1,7 +1,5 @@
 # estufaAutomaticaFeiraCiencias
 
-== Projeto Estufa Automática Feira de Ciências ==
-
 Projeto de estufa automátizada feita em arduino para feira de ciências
 
 Todas as bibliotecas utilizadas estão na pasta libraries do projeto, as mesma devem ser colocadas
