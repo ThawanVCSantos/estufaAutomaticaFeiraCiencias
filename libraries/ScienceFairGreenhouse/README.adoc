@@ -1,0 +1,41 @@
+= Lib Estufa Automática para Feira de Ciências
+
+Essa biblioteca adiciona enums e funções úteis que são utilizadas no arquivo `ScienceFairGreenhouse.ino`. Ela também contém uma nova classe `Display`, que estende a classe `LiquidCrystal`, permitindo a adição de funcionalidades específicas ao programa, além de aproveitar as funções já existentes da biblioteca `LiquidCrystal`.
+
+Mais detalhes sobre a implementação podem ser encontrados diretamente nos códigos da biblioteca.
+
+== Geral
+
+=== Arquivos
+
+- `ScienceFairGreenhouse.h`
+- `Display.h`
+- `Display.cpp`
+- `AnimationDirection.h`
+- `IrrigationMode.h`
+
+=== Arquivo Principal
+
+O arquivo `ScienceFairGreenhouse.h` é o ponto central da biblioteca, incluindo todos os outros arquivos. Dessa forma, apenas um arquivo precisa ser incluído no `ScienceFairGreenhouse.ino`.
+
+=== Nova Classe `Display`
+
+A classe `Display` estende `LiquidCrystal` para criar novas funções além das oferecidas pela biblioteca padrão. Ela fornece funcionalidades como:
+
+- Execução mais eficiente do método `print`.
+- Funções de animação, como scrolls para transição de telas e animações de carregamento (`loading`) sem interromper a execução do programa.
+
+Essas funções tornam a interação com o display mais simples e eficaz durante a execução do programa `ScienceFairGreenhouse.ino`.
+
+- **Arquivos relacionados à classe `Display`:**
+  - `Display.h`: Contém a declaração da classe `Display`, incluindo protótipos de funções.
+  - `Display.cpp`: Implementa a classe `Display` e suas funções.
+
+=== Novo Enum `AnimationDirection`
+
+O enum `AnimationDirection` é utilizado como parâmetro para definir a direção da animação de rolagem (esquerda ou direita) no método `println` da classe `Display`. Ele está localizado no arquivo `AnimationDirection.h`.
+
+=== Novo Enum `IrrigationMode`
+
+O enum `IrrigationMode` é utilizado para tipar, armazenar e comparar o estado da irrigação. Os modos variam entre automático, manual com irrigação ligada, e manual com irrigação desligada. Isso proporciona um maior controle sobre o estado da irrigação de maneira mais clara e organizada. Este enum está localizado no arquivo `IrrigationMode.h`.
+
