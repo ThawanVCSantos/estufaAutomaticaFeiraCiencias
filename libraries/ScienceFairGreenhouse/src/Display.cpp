@@ -140,7 +140,7 @@ void Display::onLoading(char firstLineText[17], char loadingText[17]) {
   // Obtém o instante atual
 
   unsigned long currentTimer = millis();
-  
+
   // Verifica se o intervalo de atualização foi alcançado
   if (currentTimer - previousTimer >= loadingInterval) {
     // Atualiza o timer

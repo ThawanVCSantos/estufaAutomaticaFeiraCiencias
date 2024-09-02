@@ -36,6 +36,8 @@
 
 #define IRRIGATION_INTERVAL_SOGGY_SOIL 3600000
 
+#define SOGGY_SOIL_MESSAGE_DURATION 2000
+
 // Tempo (em milissegundos) que ficará sem atualizar o valor da umidade (1s)
 
 #define HUMIDITY_INTERVAL 1000
@@ -55,7 +57,7 @@ int currentHumidity = 0;
 
 // Váriavel auxiliar para formatar a umidade para o display
 
-char formatHumidity[17] = ""; 
+char formatHumidity[17] = "";
 
 // Váriaveis para controle de tempo sem travar a execução
 
@@ -86,7 +88,7 @@ void setup() {
   digitalWrite(PUMP_PIN, HIGH);
 
   // Inicia o Display e define as dimensões (quantidade de colunas e de linhas, respectivamente)
- 
+
   display.begin(16, 2);
 
   // Chama a função de Introdução
@@ -94,7 +96,7 @@ void setup() {
   display.intro();
 
 }
- 
+
 // Rodará em Looping até desligar o arduino
 
 void loop() {
@@ -129,7 +131,7 @@ void loop() {
       // Só chama a animação caso o modo seja diferente de manual ligado, para evitar que animação seja acionada sem que mude o modo
       // apenas desligue a irrigação ao invés de realmente trocar de automático para manual
 
-      if(irrigationMode != IrrigationMode::MANUAL_MODE_ON) 
+      if(irrigationMode != IrrigationMode::MANUAL_MODE_ON)
         display.println("MODO MANUAL", formatHumidity, AnimationDirection::RIGHT_SCROLLING);
 
       // Seta o Modo de irrigação para manual desligado
@@ -138,7 +140,7 @@ void loop() {
     // Para evitar que faça mais de uma leitura em um clique
     delay(200);
   }
-  
+
   // Se o botão "Automático" for pressionado, coloca a irrigação no modo automático
 
   if(btnAutoState == LOW) {
@@ -179,8 +181,15 @@ void loop() {
   if(irrigationMode == IrrigationMode::AUTOMATIC_MODE) {
 
     // Verifica se já passou o tempo de espera (IRRIGATION_INTERVAL) desde a última irrigação
+    // Separando pois as váriaveis de tempo são unsigned, ou seja apenas números naturais, logo
+    // se currentTimer for menor que previousIrrigationTimer ocorreria um erro na subtração, pois
+    // resultaria um número negativo, nisso ocorreria um underflow, que resultaria em número positivo
+    // gigante que não deveria, resultando na conclusão da condicional em momentos indevidos.
 
-    if (currentTimer - previousIrrigationTimer >= IRRIGATION_INTERVAL) {
+    const bool irregationIntervalAux = (currentTimer < previousIrrigationTimer ? false :
+     currentTimer - previousIrrigationTimer >= IRRIGATION_INTERVAL);
+
+    if (irregationIntervalAux) {
 
       // Atualiza o valor do tempo anterior de espera da irrigação
 
@@ -191,16 +200,20 @@ void loop() {
 
         digitalWrite(PUMP_PIN, LOW);
 
+        // Para garantir que não exiba a mensagem de solo encharcado
+
+        soggySoilMessageStartTimer = 0;
+
         // Seta os valores auxiliares para que regue por pelo tempo de irrigação defindo e espere o tempo de espera definido, para regar novamente
 
         irrigationStartTimer = currentTimer;
-        previousIrrigationTimer = currentTimer;
+        previousIrrigationTimer = currentTimer + IRRIGATION_DURATION;
       } else {
         display.println("MODO AUTOMATICO", "SOLO ENCHARCADO");
-        
-        // Caso o Solo esteja encharcado, checa novamente após um período menor, designado por (IRRIGATION_INTERVAL_SOGGY_SOIL) 
 
-        previousIrrigationTimer = currentTimer - IRRIGATION_INTERVAL - IRRIGATION_INTERVAL_SOGGY_SOIL;
+        // Caso o Solo esteja encharcado, checa novamente após um período menor, designado por (IRRIGATION_INTERVAL_SOGGY_SOIL)
+
+        previousIrrigationTimer = currentTimer - (IRRIGATION_INTERVAL - IRRIGATION_INTERVAL_SOGGY_SOIL);
 
         // Salva o instante que mostrou a mensagem, para garantir que a mostre durante o tempo designado (soggySoilMessageStartTimer) sem travar a execução
 
@@ -208,7 +221,7 @@ void loop() {
 
       }
       // Caso a mensagem tenha sido mostrada durante o tempo designado (soggySoilMessageStartTimer) e esteja ativada (soggySoilMessageStartTimer > 0)
-    } else if(soggySoilMessageStartTimer > 0 && (currentTimer - soggySoilMessageStartTimer >= 2000)) {
+    } else if(soggySoilMessageStartTimer > 0 && (currentTimer - soggySoilMessageStartTimer >= SOGGY_SOIL_MESSAGE_DURATION)) {
       // Parar de mostrar a mensagem do solo encharcado
 
       soggySoilMessageStartTimer = 0;
@@ -230,9 +243,9 @@ void loop() {
     }
 
     // Caso não tenha completado a irrigação, a mantém ligada pelo tempo determinado
-    // Caso tenha completo, desliga a bomba d'água, também garante que 
+    // Caso tenha completo, desliga a bomba d'água, também garante que
     // a bomba se mantenha desligada durante as múltiplas renderizações.
-    // A primeira verificação serve para garantir que não mantenha acionado 
+    // A primeira verificação serve para garantir que não mantenha acionado
     // caso não tenha sido acionado anteriormente.
 
     if (irrigationStartTimer > 0 && (currentTimer - irrigationStartTimer <= IRRIGATION_DURATION)) {
